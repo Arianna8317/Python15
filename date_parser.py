@@ -55,7 +55,6 @@ def data_parser(text):
         #В этом случае берётся первый в месяце день недели, текущий день недели и/или текущий месяц.
         
         if not data[0].isdigit(): # первый введенный аргумент текстовый
-            print(data[0])
             if data[0] in week_days.keys(): # считаем, что это день недели
                 week_day = week_days[data[0]] 
         elif not data[0].isalpha() and int(data[0]) in week_days.values():
@@ -68,15 +67,25 @@ def data_parser(text):
         elif int(data[1]) in months.values():
             month = int(data[1])        
             
+        
+       
+        # проверим, можно ли считать первый аргумент номером дня недели
+        if data[0][0].isdigit() and not data[0].isalpha() : 
+            if int(data[0][0]) < 1 or int(data[0][0])>4:
+                logging.error("Вы ввели номер дня недели  не верно ! " + TEXT)
+                return False
+            else: # все нормально
+                pointer = (int(data[0][0])-1)*7 
+                if not data[1].isdigit(): 
+                    if data[1] in week_days.keys(): # считаем, что это день недели
+                        week_day = week_days[data[1]] 
+                elif not data[1].isalpha() and int(data[1]) in week_days.values():
+                        week_day = int(data[1])   
+                month = datetime.now().month
+               
         if week_day == 0 or month == 0:
             logging.error("Не верный формат! " + TEXT)
             return False  
-        
-             
-        if month == 0:
-            logging.error("Вы ввели месяц не верно ! " + TEXT)
-            return False
-        
                 
     else:         
         logging.error("Ввод не верный! " + TEXT)
@@ -89,12 +98,16 @@ def data_parser(text):
         delta += 7  
     return date(year, month, delta)
     
+
 print(data_parser("2-й вторник августа "))
 print(data_parser("2-й 2 августа "))
 print(data_parser("3-й 4 5"))
-print(data_parser("вторник 9 "))
+print(data_parser("вторник 8 "))
 print(data_parser("2 августа"))
 print(data_parser("2 8 "))
+print(data_parser("3-й вторник"))
+print(data_parser("3-й 2"))
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Парсер даты')
     parser.add_argument('param', metavar='number_in_month week_day month', type=str,  nargs="*", help='пример ввода аргументов: 1-e воскресенье сентября')
