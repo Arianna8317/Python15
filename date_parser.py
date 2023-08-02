@@ -100,6 +100,7 @@ def data_parser(text):
     
 
 print(data_parser("2-й вторник августа "))
+print(data_parser("2-й вторник аваста ")) # не верно месяц - в лог
 print(data_parser("2-й 2 августа "))
 print(data_parser("3-й 4 5"))
 print(data_parser("вторник 8 "))
