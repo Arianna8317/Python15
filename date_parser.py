@@ -7,7 +7,7 @@
 '''
 from datetime import datetime, date, time
 import logging
-import argparse
+#import argparse
 
 def data_parser(text):
     year = datetime.now().year
@@ -16,6 +16,9 @@ def data_parser(text):
     data = text.split() 
     week_day = 0
     month = 0 
+    first_day = 0
+    first_arg, second_arg, third_arg = True, True, True
+    pointer = 0
     TEXT = "Формат даты : 3-е воскресенье февраля"
     logging.basicConfig(filename ="parser.log" , encoding = "Utf-8", level=logging.ERROR)
     if len(data)==3:
@@ -45,25 +48,53 @@ def data_parser(text):
         elif int(data[0][0]) < 1 or int(data[0][0])>4:
             logging.error("Вы ввели номер дня недели  не верно ! " + TEXT)
             return False
+        else:     
+            pointer = (int(data[0][0])-1)*7 
             
-    pointer = (int(data[0][0])-1)*7   
-         
+    elif len(data) == 2:
+        #В этом случае берётся первый в месяце день недели, текущий день недели и/или текущий месяц.
+        
+        if not data[0].isdigit(): # первый введенный аргумент текстовый
+            print(data[0])
+            if data[0] in week_days.keys(): # считаем, что это день недели
+                week_day = week_days[data[0]] 
+        elif not data[0].isalpha() and int(data[0]) in week_days.values():
+            week_day = int(data[0])    
+            # тогда второй - месяц         
+                
+        if not data[1].isdigit(): # текстом
+            if data[1] in months.keys(): 
+                month = months[data[1]]  # числом
+        elif int(data[1]) in months.values():
+            month = int(data[1])        
+            
+        if week_day == 0 or month == 0:
+            logging.error("Не верный формат! " + TEXT)
+            return False  
+        
+             
+        if month == 0:
+            logging.error("Вы ввели месяц не верно ! " + TEXT)
+            return False
+        
+                
+    else:         
+        logging.error("Ввод не верный! " + TEXT)
+        return False
+            
     date_1 = date(year, month, 1)
-    first_day = date_1.isoweekday()
-    delta = 0 
-    
-    delta = week_day - first_day + pointer
+    first_day = date_1.isoweekday() # день недели 1 числа месяца
+    delta = week_day - first_day + pointer + 1 
     if week_day < first_day:
         delta += 7  
-    return date(year, month, 1+delta)
-
+    return date(year, month, delta)
     
-d = data_parser("6-е 5 7")
-print(d)
-
-    
-d = data_parser("1-е 5 июля")
-print(d)
+print(data_parser("2-й вторник августа "))
+print(data_parser("2-й 2 августа "))
+print(data_parser("3-й 4 5"))
+print(data_parser("вторник 9 "))
+print(data_parser("2 августа"))
+print(data_parser("2 8 "))
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Парсер даты')
     parser.add_argument('param', metavar='number_in_month week_day month', type=str,  nargs="*", help='пример ввода аргументов: 1-e воскресенье сентября')
